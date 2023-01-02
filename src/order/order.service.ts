@@ -22,19 +22,11 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto, user: User) {
-    const items = await this.itemRepository.find({
-      where: { id: In(createOrderDto.items) },
-    });
-
-    if (items.length < 1) {
-      throw new ConflictException('Empty cart');
-    }
-
     const order = this.orderRepository.create({
       menu: createOrderDto.menu,
       user,
     });
-    order.items = items;
+    order.items = user.cart.items;
 
     const newOrder = await this.orderRepository.save(order);
 
